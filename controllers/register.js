@@ -3,16 +3,9 @@ import debug from "debug";
 const log = debug(`currency_converter:controler:register_post`)
 
 export default function register(req, res, next) {
-    if(req.params.userId) {
-        const id = req.params.userId.toUpperCase();
-        res.status = 200;
-        res.json({userId: id, isValidUserId: isValidId(id)});
-    } else {
-        const id = req.body.userId || {};
-        res.status = 200;
-        res.json(id);
-    }
-
+    const nickName = req.body.nickName || "";
+    const id = req.params.userId || req.body.userId;
+    isValidId(id) ? res.json({userId: id, nickName: nickName}) : res.redirect('/');
 }
 
 const isValidId = (id) => {
