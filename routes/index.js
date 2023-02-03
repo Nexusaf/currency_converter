@@ -1,4 +1,4 @@
-import { Router } from "express";
+import express, { Router } from "express";
 import errorHandle from "../controllers/errorHandler.js";
 import index from "../controllers/index.js"
 import register from "../controllers/register.js"
@@ -9,7 +9,7 @@ const routes = new Router();
 
 routes.get('/', index);
 routes.get('/recover/:id', recover);
-routes.post('/register/:id', register);
+routes.post(['/register/', '/register/:userId'], register);
 routes.post('/convert/:id', convert);
 
 routes.use(errorHandle.notFound);
