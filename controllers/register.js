@@ -4,28 +4,41 @@ import usersDb from "../db/users.js"
 
 const log = debug(`currency_converter:controler:register_post`);
 
-//Ainda falta implementar regra para não adicionar ID duplicado
-
 export default function register(req, res, next) {
     const nickName = req.body.nickName || "";
     const id = req.params.userId || req.body.userId;
+    const msg = {message: "Id already in used"}
 
-    const data = {
+    const document = {
         userId: formatId(id),
         nickName: nickName,
         register_date: new Date()
     }
 
-    isValidId(id) ? appendDb(data, res) : res.redirect('/');
+    userHasRegistration(document.userId, usersDb, res) ? insertDb(document, res) : res.json(msg);
 }
 
-const appendDb = (data, res) => {
-    usersDb.push(data);
+const insertDb = (doc, res) => {
+    usersDb.push(doc);
+    let data = `export default ${JSON.stringify(usersDb, null, 2)}`;
 
-    fs.writeFile('./db/users.js', `export default ${JSON.stringify(usersDb, null, 2)}`, err => {
+    fs.writeFile('./db/users.js', data, err => {
         if(err) next(err);
-        res.json(data);
+        res.json(doc);
     });
+}
+
+const userHasRegistration = (id, db, res) => {
+    if(isValidId(id)) {
+        for (let i = 0; i < db.length; i++) {
+            if(db[i].userId === id){
+                return false;
+            }
+        }
+        return true;
+    } else {
+        res.redirect('/');
+    }
 }
 
 const isValidId = id => {
