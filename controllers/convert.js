@@ -1,13 +1,26 @@
 import debug from "debug";
+import getExchangeRate from "../external_api/api_exchange.js";
+import isValidId from "../utils/validate.js";
+import formatId from "../utils/formatId.js";
 
 const log = debug(`currency_converter:controller:convert`);
 
-export default function convert(req, res, next) {
-    log(req.params);
-    log(req.body);
-    res.status = 200;
-    res.json({path: "convert controller"});
+export default async function convert(req, res, next) {
+    let userId = formatId(req.params.userId || req.body.userId);
+    userId = isValidId(userId) ? userId : res.json({message: "You must provide a valid ID"});
+    const obj = await executeConvert(req);
+    const {...data} = {userId, ...obj};
+
+    log(data);
+    res.end();
 }
 
-//Deve pegar o id do usuario, moeda base, valor, e converter entre [BRL, EUR, JPY, USS]
-//Devolver um objeto contendo id trans, iduser, moeda origem, moeda destino, valor e taxa da moeda de origem
+const executeConvert = async req => {
+    const base = req.body.base + "" || ""; 
+    const target = req.body.target + "" || "";
+    const amount = req.body.amount
+    const exchange_rate = await getExchangeRate(base, target);
+    const converted_amout = amount * exchange_rate;
+
+    return {base, target, amount, exchange_rate, converted_amout};
+}
