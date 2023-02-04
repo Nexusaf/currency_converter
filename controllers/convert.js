@@ -4,13 +4,13 @@ import isValidId from "../utils/validate.js";
 import formatId from "../utils/formatId.js";
 import symbols from "../utils/symbols.js";
 import transactionsDb from "../db/transactions.js";
+import userHasRegistration from "../utils/userHasRegistration.js";
 import fs from "fs";
 
 const log = debug(`currency_converter:controller:convert`);
 
 export default async function convert(req, res, next) {
     let userId = formatId(req.params.userId || req.body.userId);
-    log(userId);
     if(!isValidId(userId) && !isValidInputData(req.body, symbols)) {
         res.redirect('/');
     }
@@ -18,11 +18,12 @@ export default async function convert(req, res, next) {
     const transaction = await executeConvert(req);
     let {...document} = {userId, ...transaction};
     document = JSON.stringify(document);
-
-    if(isValidId(userId)) {
+    
+    if(isValidId(userId) && userHasRegistration(userId, transactionsDb, res)) {
         insertDb(document, next);
         res.end(document);
     } else {
+        log('here')
         res.redirect('/');
     }
 }

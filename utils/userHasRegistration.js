@@ -1,14 +1,12 @@
+import debug from "debug";
+
+const log = debug('currency_converter:utils:userHasRegistration')
+
 const userHasRegistration = (id, db, res) => {
-    if(isValidId(id)) {
-        for (let i = 0; i < db.length; i++) {
-            if(db[i].userId === id){
-                return false;
-            }
-        }
-        return true;
-    } else {
-        res.redirect('/');
+    for (let i = 0; i < db.length; i++) {
+        if (db[i].userId === id) return true
     }
+    return false
 }
 
 export default userHasRegistration;

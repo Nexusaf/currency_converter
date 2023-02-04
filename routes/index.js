@@ -8,7 +8,7 @@ import recover from "../controllers/recover.js"
 const routes = new Router();
 
 routes.get('/', index);
-routes.get('/recover/:id', recover);
+routes.get('/recover/:userId', recover);
 routes.post(['/register/', '/register/:userId'], userRegister);
 routes.post('/convert/:userId', convert);
 

@@ -3,6 +3,7 @@ import fs from "fs";
 import usersDb from "../db/users.js";
 import userHasRegistration from "../utils/userHasRegistration.js";
 import formatId from "../utils/formatId.js";
+import isValidId from "../utils/validate.js";
 
 const log = debug(`currency_converter:controler:register_post`);
 
@@ -17,7 +18,18 @@ export default function register(req, res, next) {
         register_date: new Date()
     }
 
-    userHasRegistration(document.userId, usersDb, res) ? insertDb(document, res) : res.json(msg);
+    if (!isValidId(document.userId)) {
+        res.json({ message: "Invalid ID" });
+        return;
+    }
+    
+    if (userHasRegistration(document.userId, usersDb, res)) {
+        res.json({ message: "User has registered" });
+        return;
+    }
+    
+    insertDb(document, res);
+    res.json(document);    
 }
 
 const insertDb = (doc, res) => {
