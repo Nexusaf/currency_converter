@@ -10,7 +10,7 @@ const log = debug(`currency_converter:controller:convert`);
 
 export default async function convert(req, res, next) {
     let userId = formatId(req.params.userId || req.body.userId);
-
+    log(userId);
     if(!isValidId(userId) && !isValidInputData(req.body, symbols)) {
         res.redirect('/');
     }
@@ -19,8 +19,11 @@ export default async function convert(req, res, next) {
     let {...document} = {userId, ...transaction};
     document = JSON.stringify(document);
 
-    if(insertDb(document, next)) {
+    if(isValidId(userId)) {
+        insertDb(document, next);
         res.end(document);
+    } else {
+        res.redirect('/');
     }
 }
 
@@ -61,11 +64,12 @@ const isValidInputData = (inputData, symbols) => {
 const insertDb = (doc, next) => {
     doc = JSON.parse(doc);
     transactionsDb.push(doc);
-    
     let data = `export default ${JSON.stringify(transactionsDb, null, 2)}`;
-
+    
     fs.writeFile('./db/transactions.js', data, err => {
-        if (err) next(err);
-        return { sucess: true }
-    })
+        if (err) next(err)
+        let lastIndex = transactionsDb.length - 1;
+        let transactionId = JSON.stringify(transactionsDb[lastIndex].transactionId);
+        log(`New document inserted: Transaction ID: ${transactionId}`);
+    });
 }
