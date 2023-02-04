@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "set DEBUG=currency_converter:* && nodemon ./config/server.js"
+    "dev": "set DEBUG=currency_converter:* && nodemon --no-warnings ./config/server.js"
   },
   "keywords": [],
   "author": "",

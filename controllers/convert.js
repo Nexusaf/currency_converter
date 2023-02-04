@@ -69,7 +69,7 @@ const insertDb = (doc, next) => {
     fs.writeFile('./db/transactions.js', data, err => {
         if (err) next(err)
         let lastIndex = transactionsDb.length - 1;
-        let transactionId = JSON.stringify(transactionsDb[lastIndex].transactionId);
+        let transactionId = transactionsDb[lastIndex].transactionId;
         log(`New document inserted: Transaction ID: ${transactionId}`);
     });
 }
