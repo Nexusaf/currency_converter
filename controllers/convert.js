@@ -2,24 +2,27 @@ import debug from "debug";
 import getExchangeRate from "../external_api/api_exchange.js";
 import isValidId from "../utils/validate.js";
 import formatId from "../utils/formatId.js";
+import symbols from "../utils/symbols.js";
 
 const log = debug(`currency_converter:controller:convert`);
 
 export default async function convert(req, res, next) {
     let userId = formatId(req.params.userId || req.body.userId);
-    userId = isValidId(userId) ? userId : res.redirect('/');
+
+    if(!isValidId(userId) && !isValidInputData(req.body, symbols)) {
+        res.redirect('/');
+    }
 
     const transaction = await executeConvert(req);
     let {...data} = {userId, ...transaction};
     data = JSON.stringify(data);
-
     res.end(data);
 }
 
 const executeConvert = async req => {
     const transactionId = generateTransactionId();
-    const base = req.body.base + "" || ""; 
-    const target = req.body.target + "" || "";
+    const base = `${req.body.base}` || ""; 
+    const target = `${req.body.target}` || "";
     const amount = req.body.amount
     const exchange_rate = await getExchangeRate(base, target);
     const converted_amout = amount * exchange_rate;
@@ -36,4 +39,16 @@ const generateTransactionId = () => {
         result += chars.charAt(randIndex);
     }
     return result;
+}
+
+const isValidInputData = (inputData, symbols) => {    
+    const base = inputData.base || "";
+    const amount = inputData.amount;
+    const target = inputData.target || "";
+
+    const isValidAmount =  amount > 0;
+    const isValidBase =  base.length === 3 && symbols.includes(base);
+    const isValidTarget =  target.length === 3 && symbols.includes(target);
+
+    return [isValidAmount, isValidBase, isValidTarget].every(predicate => Boolean(predicate));
 }
