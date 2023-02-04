@@ -1,6 +1,8 @@
 import debug from "debug";
 import fs from "fs";
-import usersDb from "../db/users.js"
+import usersDb from "../db/users.js";
+import userHasRegistration from "../utils/userHasRegistration.js";
+import formatId from "../utils/formatId.js";
 
 const log = debug(`currency_converter:controler:register_post`);
 
@@ -26,30 +28,4 @@ const insertDb = (doc, res) => {
         if(err) next(err);
         res.json(doc);
     });
-}
-
-const userHasRegistration = (id, db, res) => {
-    if(isValidId(id)) {
-        for (let i = 0; i < db.length; i++) {
-            if(db[i].userId === id){
-                return false;
-            }
-        }
-        return true;
-    } else {
-        res.redirect('/');
-    }
-}
-
-const isValidId = id => {
-    const idLenght = 5;
-    const letterNumber = /^([a-zA-Z0-9]+)$/;
-    const isValidLength = id && id.length === idLenght;
-    const isValidFormat = letterNumber.test(id)
-
-    return isValidLength && isValidFormat;
-}
-
-const formatId = id => {
-    return `${id}`.toUpperCase();
 }

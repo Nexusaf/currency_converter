@@ -10,7 +10,7 @@ const routes = new Router();
 routes.get('/', index);
 routes.get('/recover/:id', recover);
 routes.post(['/register/', '/register/:userId'], register);
-routes.post('/convert/:id', convert);
+routes.post('/convert/:userId', convert);
 
 routes.use(errorHandle.notFound);
 routes.use(errorHandle.finalErrorHandle);
