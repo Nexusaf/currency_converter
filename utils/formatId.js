@@ -1,5 +1,5 @@
 const formatId = id => {
-    return `${id}`.toUpperCase();
-}
+	return `${id}`.toUpperCase();
+};
 
 export default formatId;
