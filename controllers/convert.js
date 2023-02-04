@@ -1,31 +1,40 @@
 import debug from "debug";
-import getExchangeRate from "../external_api/api_exchange.js";
-import isValidId from "../utils/validate.js";
-import formatId from "../utils/formatId.js";
-import symbols from "../utils/symbols.js";
-import transactionsDb from "../db/transactions.js";
-import userHasRegistration from "../utils/userHasRegistration.js";
 import fs from "fs";
+
+import formatId from "../utils/formatId.js";
+import isValidId from "../utils/validate.js";
+import symbols from "../utils/symbols.js";
+import userHasRegistration from "../utils/userHasRegistration.js";
+
+import getExchangeRate from "../external_api/api_exchange.js";
+
+import transactionsDb from "../db/transactions.js";
+import usersDb from "../db/users.js";
 
 const log = debug(`currency_converter:controller:convert`);
 
 export default async function convert(req, res, next) {
     let userId = formatId(req.params.userId || req.body.userId);
-    if(!isValidId(userId) && !isValidInputData(req.body, symbols)) {
-        res.redirect('/');
+
+    if(!isValidInputData(req.body, symbols)) {
+        res.json({ message: "Invalid Fomart Currency" });
+        return;
     }
 
-    const transaction = await executeConvert(req);
-    let {...document} = {userId, ...transaction};
-    document = JSON.stringify(document);
-    
-    if(isValidId(userId) && userHasRegistration(userId, transactionsDb, res)) {
+    if (!isValidId(userId)) {
+        res.json({ message: "Invalid ID" });
+        return;
+    }
+
+    const document = await normalizeDocument(userId, req);
+    log(userHasRegistration(userId, usersDb))
+    if (userHasRegistration(userId, usersDb)) {
         insertDb(document, next);
         res.end(document);
-    } else {
-        log('here')
-        res.redirect('/');
+        return;
     }
+
+    res.json({ message: "Invalid User" });
 }
 
 const executeConvert = async req => {
@@ -48,6 +57,13 @@ const generateTransactionId = () => {
         result += chars.charAt(randIndex);
     }
     return result;
+}
+
+const normalizeDocument = async (userId, req) => {
+    const transaction = await executeConvert(req);
+    let {...document} = {userId, ...transaction};
+    document = JSON.stringify(document);
+    return document;
 }
 
 const isValidInputData = (inputData, symbols) => {    

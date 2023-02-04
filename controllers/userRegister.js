@@ -23,7 +23,7 @@ export default function register(req, res, next) {
         return;
     }
     
-    if (userHasRegistration(document.userId, usersDb, res)) {
+    if (userHasRegistration(document.userId, usersDb)) {
         res.json({ message: "User has registered" });
         return;
     }
@@ -38,6 +38,7 @@ const insertDb = (doc, res) => {
 
     fs.writeFile('./db/users.js', data, err => {
         if(err) next(err);
-        res.json(doc);
+        log(data);
+        log(`New user regstered: ${userId}`)
     });
 }

@@ -7,7 +7,7 @@ const isValidId = id => {
     const letterNumber = /^([a-zA-Z0-9]+)$/;
     const isValidLength = id && id.length === idLenght;
     const isValidFormat = letterNumber.test(id)
-    log(isValidLength && isValidFormat);
+
     return isValidLength && isValidFormat;
 }
 
