@@ -30,7 +30,7 @@ export default function register(req, res, next) {
 
 const insertDb = (doc, next) => {
 	usersDb.push(doc);
-	let data = `export default ${JSON.stringify(usersDb, null, "\t\t")};`;
+	let data = `export default ${JSON.stringify(usersDb, null, "\t")};`;
 
 	fs.writeFile("./db/users.js", data, err => {
 		if(err) next(err);

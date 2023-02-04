@@ -1,4 +1,3 @@
-import debug from "debug";
 import fs from "fs";
 
 import formatId from "../utils/formatId.js";
@@ -10,8 +9,6 @@ import getExchangeRate from "../external_api/api_exchange.js";
 
 import transactionsDb from "../db/transactions.js";
 import usersDb from "../db/users.js";
-
-const log = debug("currency_converter:controller:convert");
 
 export default async function convert(req, res, next) {
 	let userId = formatId(req.params.userId || req.body.userId);
@@ -27,7 +24,6 @@ export default async function convert(req, res, next) {
 	}
 
 	const document = await normalizeDocument(userId, req);
-	log(userHasRegistration(userId, usersDb));
 	if (userHasRegistration(userId, usersDb)) {
 		insertDb(document, next);
 		res.end(document);
@@ -81,12 +77,9 @@ const isValidInputData = (inputData, symbols) => {
 const insertDb = (doc, next) => {
 	doc = JSON.parse(doc);
 	transactionsDb.push(doc);
-	let data = `export default ${JSON.stringify(transactionsDb, null, "\t\t")};`;
+	let data = `export default ${JSON.stringify(transactionsDb, null, "\t")};`;
     
 	fs.writeFile("./db/transactions.js", data, err => {
 		if (err) next(err);
-		let lastIndex = transactionsDb.length - 1;
-		let transactionId = transactionsDb[lastIndex].transactionId;
-		log(`New document inserted: Transaction ID: ${transactionId}`);
 	});
 };
