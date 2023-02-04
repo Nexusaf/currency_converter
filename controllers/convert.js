@@ -3,6 +3,8 @@ import getExchangeRate from "../external_api/api_exchange.js";
 import isValidId from "../utils/validate.js";
 import formatId from "../utils/formatId.js";
 import symbols from "../utils/symbols.js";
+import transactionsDb from "../db/transactions.js";
+import fs from "fs";
 
 const log = debug(`currency_converter:controller:convert`);
 
@@ -14,9 +16,12 @@ export default async function convert(req, res, next) {
     }
 
     const transaction = await executeConvert(req);
-    let {...data} = {userId, ...transaction};
-    data = JSON.stringify(data);
-    res.end(data);
+    let {...document} = {userId, ...transaction};
+    document = JSON.stringify(document);
+
+    if(insertDb(document, next)) {
+        res.end(document);
+    }
 }
 
 const executeConvert = async req => {
@@ -51,4 +56,16 @@ const isValidInputData = (inputData, symbols) => {
     const isValidTarget =  target.length === 3 && symbols.includes(target);
 
     return [isValidAmount, isValidBase, isValidTarget].every(predicate => Boolean(predicate));
+}
+
+const insertDb = (doc, next) => {
+    doc = JSON.parse(doc);
+    transactionsDb.push(doc);
+    
+    let data = `export default ${JSON.stringify(transactionsDb, null, 2)}`;
+
+    fs.writeFile('./db/transactions.js', data, err => {
+        if (err) next(err);
+        return { sucess: true }
+    })
 }

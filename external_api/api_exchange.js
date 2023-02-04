@@ -11,6 +11,7 @@ const getExchangeRate = async (base, target) => {
   .then(response => response.json())
   .then(result => result)
   .catch(error => console.log('error', error));
+  
   return result.rates[target];
 }
 
