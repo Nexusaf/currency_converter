@@ -20,7 +20,7 @@ export default function register(req, res, next) {
 	}
     
 	if (userHasRegistration(document.userId, usersDb)) {
-		res.json({ message: "User has registered" });
+		res.json({ message: "The user already has registration" });
 		return;
 	}
     
