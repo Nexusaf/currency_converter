@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node ./config/server.js",
+    "start": "node --no-warnings ./config/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "set DEBUG=currency_converter:* && nodemon --no-warnings ./config/server.js"
   },

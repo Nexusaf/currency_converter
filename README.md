@@ -4,6 +4,52 @@
 
 Esta API fornece endpoints para realizar operações de conversão de moeda mediante a um id de usuário fornecido.
 
+## Inicialização
+```bash
+npm init
+```
+```bash
+npm run start
+```
+
+### Exemplo de uso
+
+POST
+```bash
+http://localhost:3000/register/abcde
+```
+retorna
+```json
+{
+ "userId": "ABCDE",
+ "nickName": "",
+ "register_date": "2023-02-05T04:17:00.157Z"
+}
+```
+POST
+```bash
+http://localhost:3000/convert/abcde
+req.body = {
+  "base": "USD",
+  "amount": 121,
+  "target": "BRL"
+}
+```
+retorna
+```json
+{
+  "userId": "ABCDE",
+  "transactionId": "SRBLCXD2",
+  "base": "USD",
+  "target": "BRL",
+  "amount": 121,
+  "exchange_rate": 5.150271,
+  "converted_amout": 623.182791,
+  "date": "2023-02-05T04:24:06.405Z"
+}
+```
+
+
 ## Endpoints
 
 ### GET /
@@ -33,13 +79,40 @@ Obtém todas as conversões feitas para o ID de usuário especificado.
 
 #### Resposta
 
-- Se a recuperação foi bem-sucedida.
+- Se a recuperação foi bem-sucedida um array contendo todas as transações feitas por determinado usuário é retornado.
 ```json
-{
-  "userId": <string>,
-  "nickName": <string>,
-  "register_date": <string date>
-}
+[
+  {
+  "userId": "ABCDE",
+  "transactionId": "XOMIKM7J",
+  "base": "USD",
+  "target": "BRL",
+  "amount": 121,
+  "exchange_rate": 5.150271,
+  "converted_amout": 623.182791,
+  "date": "2023-02-05T03:30:58.327Z"
+  },
+  {
+  "userId": "ABCDE",
+  "transactionId": "XT9TVMJB",
+  "base": "USD",
+  "target": "BRL",
+  "amount": 121,
+  "exchange_rate": 5.150271,
+  "converted_amout": 623.182791,
+  "date": "2023-02-05T03:45:32.324Z"
+  },
+  {
+  "userId": "ABCDE",
+  "transactionId": "MJFWS0EI",
+  "base": "USD",
+  "target": "BRL",
+  "amount": 100,
+  "exchange_rate": 5.150271,
+  "converted_amout": 515.0271,
+  "date": "2023-02-05T04:04:33.419Z"
+  }
+]
 ```
 - Se o usuário não foi encontrado.
 ```json
@@ -71,7 +144,7 @@ Registra um novo usuário. A key `userId` deve ser fornecida obrigatoriamente no
 
 ### POST /register/:userId
 
-Registra um usuário com base no parâmetro obrigatório fornecido na url string chamado /:userId
+Registra um usuário com base no parâmetro obrigatório fornecido na url string chamado `/:userId`
 
 #### Parâmetros
 
